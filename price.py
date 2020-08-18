@@ -1,7 +1,6 @@
 import math
 import cmath
 import scipy.stats
-from scipy.stats import norm
 class Parameter:
     def __init__(self,strikeprice,currentprice,volatility,rate,time,period):
         self.K = strikeprice
@@ -18,13 +17,13 @@ class Parameter:
     def priceTreecall(self):
         for i in range(self.pr):
             temp = self.S*self.u**(self.pr - i)*self.d**(i)-self.K
-            if temp < 0
-                temp = 0
+            if temp < 0.0:
+                temp = 0.0
             self.list.append(temp)
-        for j in range(self.pr - 1)
-            for k in range(0,len(self.list) - 1,-1)
+        for j in range(self.pr - 1):
+            for k in range(0,len(self.list) - 1,-1):
                 self.list[k] = (math.exp(-self.r*self.t/self.pr)*(self.p*self.list[k]+(1-self.p)*self.list[k+1]))
-            if len(list) = 1
+            if len(list) == 1:
                 break
             self.list.pop()
         return self.list[0]
@@ -36,13 +35,13 @@ class Parameter:
     def priceTreeput(self):
         for i in range(self.pr):
             temp = self.K-self.S*self.u**(self.pr - i)*self.d**(i)
-            if temp < 0
+            if temp < 0:
                 temp = 0
             self.list.append(temp)
-        for j in range(self.pr - 1)
-            for k in range(0,len(self.list) - 1,-1)
+        for j in range(self.pr - 1):
+            for k in range(0,len(self.list) - 1,-1):
                 self.list[k] = (math.exp(-self.r*self.t/self.pr)*(self.p*self.list[k]+(1-self.p)*self.list[k+1]))
-            if len(list) = 1
+            if len(list) == 1:
                 break
             self.list.pop()
         return self.list[0]
