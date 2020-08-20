@@ -50,3 +50,18 @@ class Parameter:
         d2 = d1 - self.sigma*cmath.sqrt(self.T)
         put = self.K*exp(-1*self.r*self.T)*norm.ppf(-d2,0,1)-self.S*norm.ppf(-d1,0,1)
         return put
+    def BSMVega(self):
+        d1 = (math.log(self.S / self.K) + (self.r + self.sigma * self.sigma / 2.0) * self.T / (
+                    self.sigma * cmath.sqrt(self.T)))
+        vega = self.S * stats.norm.cdf(d1, 0, 1) * np.sqrt(self.T)
+        return Vega
+    def BSMcallimpvol(self):
+        for i in range(100):
+            sigma_est -= ((priceBSMcall() - self.C)
+                          / BSMVega())
+        return sigma_est
+    def BSMputimpvol(self):
+        for i in range(100):
+            sigma_est -= ((priceBSMput() - self.C)
+                          / BSMVega())
+        return sigma_est
