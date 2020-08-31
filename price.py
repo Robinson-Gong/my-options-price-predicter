@@ -1,10 +1,12 @@
 import math
 import cmath
 import scipy.stats
+import Getdata
+
 class Parameter:
-    def __init__(self,strikeprice,currentprice,volatility,rate,time,period):
+    def __init__(self,strikeprice,spotprice,volatility,rate,time,period,initialprice):
         self.K = strikeprice
-        self.S = currentprice
+        self.S = initialprice
         self.sigma = volatility
         self.r = rate
         self.T = time
@@ -13,7 +15,9 @@ class Parameter:
         self.u = math.exp(sigma*cmath.sqrt(t))
         self.d = u**(-1)
         self.p = (math.exp(r*t)-d)/(u-d)
+        self.C = spotprice
         self.list=[]
+
     def priceTreecall(self):
         for i in range(self.pr):
             temp = self.S*self.u**(self.pr - i)*self.d**(i)-self.K
@@ -27,11 +31,13 @@ class Parameter:
                 break
             self.list.pop()
         return self.list[0]
+
     def priceBSMcall(self):
-        d1 = (math.log(self.S/self.K)+(self.r+self.sigma*self.sigma/2.0)*self.T/(self.sigma*cmath.sqrt(self.T))
-        d2 = d1 - self.sigma*cmath.sqrt(self.T)
-        c = self.S*norm.ppf(d1,0,1)- self.K*exp(-1*self.r*self.T)*norm.ppf(d2,0,1)
-        return c
+        d1 = (math.log(self.S/self.K)+(self.r+self.sigma*self.sigma/2.0)*self.T/(self.sigma*cmath.sqrt(self.T)))
+        d2 = d1 - self.sigma * cmath.sqrt(self.T)
+        call = self.S*norm.ppf(d1,0,1)- self.K*exp(-1*self.r*self.T)*norm.ppf(d2,0,1)
+        return call
+
     def priceTreeput(self):
         for i in range(self.pr):
             temp = self.K-self.S*self.u**(self.pr - i)*self.d**(i)
@@ -45,23 +51,36 @@ class Parameter:
                 break
             self.list.pop()
         return self.list[0]
+
     def priceBSMput(self):
-        d1 = (math.log(self.S/self.K)+(self.r+self.sigma*self.sigma/2.0)*self.T/(self.sigma*cmath.sqrt(self.T))
+        d1 = (math.log(self.S/self.K)+(self.r+self.sigma*self.sigma/2.0)*self.T/(self.sigma*cmath.sqrt(self.T)))
         d2 = d1 - self.sigma*cmath.sqrt(self.T)
         put = self.K*exp(-1*self.r*self.T)*norm.ppf(-d2,0,1)-self.S*norm.ppf(-d1,0,1)
         return put
+
     def BSMVega(self):
         d1 = (math.log(self.S / self.K) + (self.r + self.sigma * self.sigma / 2.0) * self.T / (
                     self.sigma * cmath.sqrt(self.T)))
         vega = self.S * stats.norm.cdf(d1, 0, 1) * np.sqrt(self.T)
         return Vega
+
     def BSMcallimpvol(self):
         for i in range(100):
             sigma_est -= ((priceBSMcall() - self.C)
                           / BSMVega())
         return sigma_est
+
     def BSMputimpvol(self):
         for i in range(100):
             sigma_est -= ((priceBSMput() - self.C)
                           / BSMVega())
         return sigma_est
+
+
+class volatility():
+
+    def __init__(self, path = '', tscode= ''):
+        self.path = path
+        self.tscode = tscode
+
+    def 
