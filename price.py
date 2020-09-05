@@ -2,6 +2,9 @@ import math
 import cmath
 import scipy.stats
 import Getdata
+from arch.univariate import ConstantMean, GARCH, Normal
+import os
+import pandas as pd
 
 class Parameter:
     def __init__(self,strikeprice,spotprice,volatility,rate,time,period,initialprice):
@@ -78,9 +81,65 @@ class Parameter:
 
 
 class volatility():
-
-    def __init__(self, path = '', tscode= ''):
+    def __init__(self, path = '', tscode= '', format = 'k', asset = 'Index'):
         self.path = path
         self.tscode = tscode
-
-    def 
+        self.format = format
+        self.asset = asset
+    def readdata(self):
+        path = self.path
+        path = path.strip()
+        path = path.rstrip("\\")
+        isExists = os.path.exists(path)
+        if not isExists:
+            print('file does not exist')
+        else:
+            if self.asset == 'E':
+                asset = 'Stock'
+            elif self.asset == 'I':
+                asset = 'Index'
+            elif self.asset == 'C':
+                asset = 'DigitalCurrency'
+            elif self.asset == 'FT':
+                asset = 'Future'
+            elif self.asset == 'FD':
+                asset  = 'Fund'
+            elif self.asset == 'O':
+                asset = 'Options'
+            elif self.asset == 'CB':
+                asset  = 'ConvertibleBond'
+            csv_filepath = self.path + '\\' + asset  + '\\' + self.tscode + '\\' + self.tscode + '_' + self.format + '.csv'
+            csv_data = pd.read_csv(csv_filepath)
+            return csv_data
+    def getyieldrate(self):
+        dataframe = volatility.readdata(self)
+        yieldrate = 100*dataframe['close'].pct_change().dropna()
+        if self.asset == 'E':
+            asset = 'Stock'
+        elif self.asset == 'I':
+            asset = 'Index'
+        elif self.asset == 'C':
+            asset = 'DigitalCurrency'
+        elif self.asset == 'FT':
+            asset = 'Future'
+        elif self.asset == 'FD':
+            asset = 'Fund'
+        elif self.asset == 'O':
+            asset = 'Options'
+        elif self.asset == 'CB':
+            asset = 'ConvertibleBond'
+        csv_filepath = self.path + '\\' + asset + '\\' + self.tscode + '\\' + self.tscode + '_yieldrate.csv'
+        yieldrate.to_csv(csv_filepath,index=False, encoding='gbk')
+        return yieldrate
+    def getvolatility(self):
+        df = volatility.getyieldrate(self)
+        vol = 0.0
+        for i in range(1,len(df)):
+            vol = vol + df[i]*df[i]/10000.0
+        am = ConstantMean(df)
+        am.volatility = GARCH(1, 0, 1)
+        am.distribution = Normal()
+        res = am.fit()
+        print('vol =' + str(vol))
+        print(res.summary)
+        return 0
