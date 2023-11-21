@@ -1,10 +1,12 @@
 import math
 import cmath
-import scipy.stats
+from math import exp
+from scipy.stats import norm
 import Getdata
 from arch.univariate import ConstantMean, GARCH, Normal
 import os
 import pandas as pd
+import numpy as np
 
 class Parameter:
     def __init__(self,strikeprice,spotprice,volatility,rate,time,period,initialprice):
@@ -14,10 +16,10 @@ class Parameter:
         self.r = rate
         self.T = time
         self.pr = period
-        self.t = self.T/slef.pr
-        self.u = math.exp(sigma*cmath.sqrt(t))
-        self.d = u**(-1)
-        self.p = (math.exp(r*t)-d)/(u-d)
+        self.t = self.T/self.pr
+        self.u = math.exp(self.sigma*cmath.sqrt(self.t))
+        self.d = self.u**(-1)
+        self.p = (math.exp(self.r*self.t)-self.d)/(self.u-self.d)
         self.C = spotprice
         self.list=[]
 
@@ -64,19 +66,21 @@ class Parameter:
     def BSMVega(self):
         d1 = (math.log(self.S / self.K) + (self.r + self.sigma * self.sigma / 2.0) * self.T / (
                     self.sigma * cmath.sqrt(self.T)))
-        vega = self.S * stats.norm.cdf(d1, 0, 1) * np.sqrt(self.T)
-        return Vega
+        vega = self.S * norm.cdf(d1, 0, 1) * np.sqrt(self.T)
+        return vega
 
     def BSMcallimpvol(self):
+        sigma_est = self.sigma
         for i in range(100):
-            sigma_est -= ((priceBSMcall() - self.C)
-                          / BSMVega())
+            sigma_est -= ((self.priceBSMcall() - self.C)
+                          / self.BSMVega())
         return sigma_est
 
     def BSMputimpvol(self):
+        sigma_est = self.sigma
         for i in range(100):
-            sigma_est -= ((priceBSMput() - self.C)
-                          / BSMVega())
+            sigma_est -= ((self.priceBSMput() - self.C)
+                          / self.BSMVega())
         return sigma_est
 
 
